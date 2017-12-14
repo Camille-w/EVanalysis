@@ -4,7 +4,7 @@
 
 Le projet final comprendra :
 
-* une Intoduction visant à présenter notre problématique
+* une intoduction visant à présenter notre problématique
 * une revue de la littérature existante sur notre sujet
 * une description de nos données
 * une analyse statistique exploratoire
@@ -16,6 +16,7 @@ Le projet final comprendra :
 Ce projet contient les fichiers suivants :
 
 * README.md : description du projet, des données, des méthodes
+* AllData.csv : data table (by state, in 2016)
 * ...
 
 ### About our data (2016 values)
@@ -24,12 +25,12 @@ __Here is the different data we aim to work on__ :
 
 - [x] part du parc de EV rapporté à la population (nb pour 1000 hab)
 - [ ] montant moyen de l’EV ($)
-- [ ] niveau de salaire ($)
-- [ ] niveau éducation (années)
+- [x] niveau de salaire ($)
+- [ ] niveau éducation (années ?)
 - [ ] action publique($) —> gap ou subventions (exemption d’impôt) toutes séparées (plus ou moins
 - [ ] prix électricité ($)
 - [ ] accès au parking ?
-- [ ] nombre de bornes (rapporté à la superficie, ou à la population)
+- [x] nombre de bornes (rapporté à la population)
 - [ ] nature du possesseur (privé, état, entreprise) ---> analyse de variance
 
 _check when the data has been imported on the repository_
