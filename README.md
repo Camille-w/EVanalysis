@@ -16,22 +16,22 @@ Le projet final comprendra :
 Ce projet contient les fichiers suivants :
 
 * README.md : description du projet, des données, des méthodes
-* AllData.csv : data table (by state, in 2016)
+* AllData.csv : data table (by state, in 2016) comportant les données cochées ci après 
 * ...
 
 ### About our data (2016 values)
 
 __Here is the different data we aim to work on__ : 
 
+- [x] (population de l'état)
 - [x] part du parc de EV rapporté à la population (nb pour 1000 hab)
-- [ ] montant moyen de l’EV ($)
-- [x] niveau de salaire ($)
-- [ ] niveau éducation (années ?)
-- [ ] action publique($) —> gap ou subventions (exemption d’impôt) toutes séparées (plus ou moins
-- [ ] prix électricité ($)
+- [x] niveau de salaire ($) ; 2 data : personal income per capita et mean household income
+- [x] niveau éducation ; 3 data : % de plus de 25 ans ayant atteint un certain niveau de diplome (High School, Bachelor, Advanced)
+- [x] prix moyen de vente de l'électricité (cents/kWh)
+- [x] nombre de bornes (nb d'unité de charge pour 1000 hab) ; 2 data : fast charging units only ; Level II AND fast charging units
+- [ ] action publique($) —> gap ; séparées selon le type de mesure
+- [ ] nature du possesseur (privé, état, entreprise) ? ---> analyse de variance
 - [ ] accès au parking ?
-- [x] nombre de bornes (rapporté à la population)
-- [ ] nature du possesseur (privé, état, entreprise) ---> analyse de variance
 
 _check when the data has been imported on the repository_
 
