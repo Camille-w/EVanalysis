@@ -18,11 +18,11 @@ Ce projet contient les fichiers suivants :
 * README.md : description du projet, des données, des méthodes
 * ...
 
-### About our data 
+### About our data (2016 values)
 
 __Here is the different data we aim to work on__ : 
 
-- [ ] part du parc de EV rapporté à la population (nb pour 1000 hab)
+- [x] part du parc de EV rapporté à la population (nb pour 1000 hab)
 - [ ] montant moyen de l’EV ($)
 - [ ] niveau de salaire ($)
 - [ ] niveau éducation (années)
@@ -53,7 +53,7 @@ __Here are the diferent data we aim to work on__ :
 - [ ] penser au test d'égalité des variances si le modèle nécessite cette hypothèse (Y or N ?)
 - [ ] penser à ajuster les niveaux de test si des tests multiples sont effectués
 
-_check when the data has been imported on the repository_
+_check when the method have been applied through one of the repository files_
 
 
 ### About ours methods of econometric analysis 
