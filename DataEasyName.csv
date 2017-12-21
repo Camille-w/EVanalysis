@@ -1,4 +1,4 @@
-State;Code;Population Estimates;PEV Registrations per 1000 People;Total Charging Units per 1000 People;Fast Charging Units per 1000 People;Revised annual personal income per capita;Median Household Income;Percent Of People 25 Years And Over Who Have Completed High School (Includes Equivalency);Percent Of People 25 Years And Over Who Have Completed A Bachelor's Degree;Percent Of People 25 Years And Over Who Have Completed an Advanced Degree;Average retail price of electricity (cents/kWh)
+State;Code;Population;PEVRegistrations;TotalChargingUnits;FastChargingUnits;RevisedAnnualPersonalIncomePerCapita;MedianHouseholdIncome;PercentOfHighSchoolDegree;PercentOfBachelorDegree;PercentOfAdvancedDegree;AverageRetailPriceOfElectricity
 ALABAMA;AL;4 863 300;0.324;0.050;0.010;38 896;44 758;85.1 %;24.7 %;9.4 %;9.33
 ALASKA;AK;741 894;0.551;0.012;0.000;55 645;74 444;93.1 %;29.6 %;10.6 %;17.59
 ARIZONA;AZ;6 931 071;1.656;0.148;0.021;40 415;51 340;86.7 %;28.9 %;10.8 %;10.34
