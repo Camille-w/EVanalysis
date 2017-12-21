@@ -17,6 +17,11 @@ Ce projet contient les fichiers suivants :
 
 * README.md : description du projet, des données, des méthodes
 * AllData.csv : data table (by state, in 2016) comportant les données cochées ci après 
+* DataEasyName.csv : la table AllData.csv avec de noms de colonnes utilisables pour R (espaces, ...)
+* DataEasyNameOnlyStates.csv : DataEasyName.csv sans la valeur pour USA en totalite
+* EVanalysis.Rproj : groupement en projet R des fichiers du repertoire
+* stats.R : importation affichage et premeires analyses des donnees
+* plotData.png : scatter plot des donnees
 * ...
 
 ### About our data (2016 values)
