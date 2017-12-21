@@ -17,10 +17,14 @@ Ce projet contient les fichiers suivants :
 
 * README.md : description du projet, des données, des méthodes
 * AllData.csv : data table (by state, in 2016) comportant les données cochées ci après 
+* Biplot.png : le Biplot associé à la PCA (etat, et vecteu valeur)
 * DataEasyName.csv : la table AllData.csv avec de noms de colonnes utilisables pour R (espaces, ...)
 * DataEasyNameOnlyStates.csv : DataEasyName.csv sans la valeur pour USA en totalite
+* DataEasyNameRenorm.csv : les donnees RENORMALISEES (meme ordre de grandeur a peu pres) et noms utilisables
 * EVanalysis.Rproj : groupement en projet R des fichiers du repertoire
-* stats.R : importation affichage et premeires analyses des donnees
+* individualsPCA.png : la PCA avec les noms des etas, coloree par niveau de représentation
+* pca.R : analyses des donnees de type PCA, version finale (renormalisee, un seul revenu)
+* plot.R : affichage du scatter plot et de plusieurs regressions "interessantes"
 * plotData.png : scatter plot des donnees
 * ...
 
@@ -30,7 +34,7 @@ __Here is the different data we aim to work on__ :
 
 - [x] (population de l'état)
 - [x] part du parc de EV rapporté à la population (nb pour 1000 hab)
-- [x] niveau de salaire ($) ; 2 data : personal income per capita et mean household income
+- [x] niveau de salaire ($) ; 2 data : personal income per capita et mean household income ... et leur rapport
 - [x] niveau éducation ; 3 data : % de plus de 25 ans ayant atteint un certain niveau de diplome (High School, Bachelor, Advanced)
 - [x] prix moyen de vente de l'électricité (cents/kWh)
 - [x] nombre de bornes (nb d'unité de charge pour 1000 hab) ; 2 data : fast charging units only ; Level II AND fast charging units
@@ -46,7 +50,7 @@ _check when the data has been imported on the repository_
 __Here are the diferent data we aim to work on__ : 
 
 - [ ] statistique descriptives: moy et écart type des principales variables
-- [ ] analyse en composantes principales (R)
+- [x] analyse en composantes principales (R)
 - [ ] méthodes de classification automatique pour représenter les données et émettre des hypothèses de dépendance entre certaines variables --> cluster, k-means (R) --> états plus ou moins écolo : à corréler avec des variables quantitatives (rep, dem, ...) --> test du chi 2 pour voir si même cluster
 - [ ] test d'adéquation des données à une loi ou à une famille de loi (selon la nature des données, test du chi-2, tests de normalité, test de Kolmogorov) (juste pour une partie not. facteurs sociaux)
 - [ ] estimation des paramètres par intervalles de confiance --> surtout pour les résultat de la régression linéaire --> 50 var assez

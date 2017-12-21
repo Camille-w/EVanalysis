@@ -7,12 +7,6 @@ data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
 # table de donnee de type data.frame
 class(data_tab) 
 
-# matrice de données
-data=as.matrix(data_tab)
-#m=matrix(runif(100),10,10)
-### on enleve les colonnes state et code et population ?
-data=data[1:51,4:13]
-
 ## scatter plot des donnees 
 plot(data_tab)
 ### quelques point aberrants
@@ -41,15 +35,5 @@ plot(data_tab$PEVRegistrations,data_tab$AverageRetailPriceOfElectricity,main="Re
 ## pour identifier le point bizarre
 plot(data_tab$AverageRetailPriceOfElectricity,main="Electricity Price",xlab="Average retail price of electricity in each State in cents/kWh",ylab="rank")
 ### identification du point aberrant : Hawaii avec 26 cents / kWh
-## reste ajouter en fonction de chacun des types de mesures
-
-#### analyse en composantes principales sur la totalité des données
-#res_pca = princomp(data)
-### probleme : pourquoi ???
-## on verifie que pas de NULL
-any(is.na(data))
-## on verifie que tout est reconnu comme des nombres
-
-#print(names(res_pca))
-
-
+## reste ajouter en fonction de chacun des types de lois
+plot(data_tab)
