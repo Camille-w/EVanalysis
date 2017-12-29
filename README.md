@@ -48,7 +48,7 @@ _check when the data has been imported on the repository_
 ### About ours methods of statistical analysis 
 
 __Here are the diferent data we aim to work on__ : 
-
+- [ ] Trouver des sources de documents
 - [ ] statistique descriptives: moy et écart type des principales variables
 - [x] analyse en composantes principales (R)
 - [ ] méthodes de classification automatique pour représenter les données et émettre des hypothèses de dépendance entre certaines variables --> cluster, k-means (R) --> états plus ou moins écolo : à corréler avec des variables quantitatives (rep, dem, ...) --> test du chi 2 pour voir si même cluster
