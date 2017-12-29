@@ -8,7 +8,7 @@ Le projet final comprendra :
 * une revue de la littérature existante sur notre sujet
 * une description de nos données
 * une analyse statistique exploratoire
-* une analyse économétrique
+* une analyse économétrique(+ test hypothèses)
 * une conclusion quant à nos résultats
 
 ### Description of the repository content
