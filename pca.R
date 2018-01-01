@@ -1,8 +1,7 @@
 #On efface les variables en mémoire, permet de faire le ménage avant de commencer
 rm(list=ls())
 # ouverture des données
-#data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
-data_tab=read.table("DataEasyNameRenorm.csv",header=TRUE,sep=";", dec=",")
+data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
 
 ######## les donnees chargees viennent de DataEasyNameOnlyStates.csv
 # car il faut des noms de colonne sans espace et plus court
@@ -15,10 +14,12 @@ class(data_tab)
 
 # matrice de données
 data=data.matrix(data_tab)
-### on enleve les colonnes state et code et population 
 #data=data[1:51,3:12]
-data=data[1:51,c(3,4,5,6,8,9,10,11,12)]
-# on enleve en plus la colonne 7 car salaire median et on a deja le revenu moyen
+#data=data[1:51,c(4,5,6,8,9,10,11,12,13)]
+data=data[1:51,c(4,5,6,8,9,11,13)]
+# on enleve les colonnes 1,2,3 : info gen inutiles pour pca 
+# et 7 pour garder un seul revenu
+# et 10,12 pour garder un seul niveau de diplome
 ### on renome les lignes d'après les etats associes
 rownames(data)=c("ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", "WISCONSIN", "WYOMING")
 
@@ -29,28 +30,38 @@ any(is.na(data))
 ## on verifie que c'est des nombres --> OK
 any(is.numeric(data))
 ## on fait la pca
-pca = princomp(data)
-## on regarde comme elle est repartit
-plot(pca)
-## quasiment tout est sur la premiere composante et la deuxieme
-## on regarde ce que sont les deux premieres composantes
-pca$loadings[,1:2]
-## portion de variance de chaque composante
-100 * pca$sdev^2 / sum(pca$sdev^2)
-## variance totale expliquee par les deux premieres composantes
-sum(100*(pca$sdev^2)[1:2] / sum(pca$sdev^2))
-### 90.17394 % --> pas mal
+library("FactoMineR")
+pca=PCA(data, scale.unit = TRUE, ncp = 5, graph = TRUE)
+## et on regarde comme elle est repartie (graph=TRUE)
+#install.packages("corrplot")
+library("corrplot")
+
+## on regarde ce que sont les composantes
+pca$eig
+corrplot(pca$var$contrib, is.corr=FALSE)
+## portion de variance de chaque composante (pour les n°1 et 2)
+pca$eig[1:2,2]
+## et variance totale expliquee par les deux premieres composantes
+pca$eig[1:2,3]
+### que 67 % 
+# estimation de la qualité de reprsenation pour chaque type de données
+pca$var$cos2
+corrplot(pca$var$cos2, is.corr=FALSE)
+
 ## biplot sur les deux premieres composantes
-plot(pca$scores[,1:2])
-biplot(pca)
-# et juste sur la premiere
-#plot(pca$scores[,1], rep(0,nrow(data)))
+plot(pca)
 
 ####### Meilleure visualisation des resulats de la PCA
 #install.packages("factoextra")
 library(factoextra)
 ## scree plot
 fviz_eig(pca)
+
+# Cos2 total des variables sur Dim1 et Dim2
+fviz_cos2(pca, choice = "var", axes = 1:2)
+
+#contribution des colonnes de données
+fviz_contrib(pca, choice = "var", axes = 1:2, top = 10)
 
 ## Graphique des individus avec coloration selon la qualité de représentation
 # Les individus similaires sont groupés ensemble par couleur
