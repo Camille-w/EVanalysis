@@ -23,7 +23,8 @@ Ce projet contient les fichiers suivants :
 * DataEasyNameRenorm.csv : les donnees RENORMALISEES (meme ordre de grandeur a peu pres) et noms utilisables
 * EVanalysis.Rproj : groupement en projet R des fichiers du repertoire
 * individualsPCA.png : la PCA avec les noms des etas, coloree par niveau de représentation
-* pca.R : analyses des donnees de type PCA, version finale (renormalisee, un seul revenu)
+* pca.R : analyses des donnees de type PCA, (normalisee automatiquement, selection des colonnes)
+* pcaCluster.R : PCA normalisee et plusieurs analyse de clustering (avec leur pertinence)
 * plot.R : affichage du scatter plot et de plusieurs regressions "interessantes"
 * plotData.png : scatter plot des donnees
 * ...
@@ -38,20 +39,19 @@ __Here is the different data we aim to work on__ :
 - [x] niveau éducation ; 3 data : % de plus de 25 ans ayant atteint un certain niveau de diplome (High School, Bachelor, Advanced)
 - [x] prix moyen de vente de l'électricité (cents/kWh)
 - [x] nombre de bornes (nb d'unité de charge pour 1000 hab) ; 2 data : fast charging units only ; Level II AND fast charging units
-- [ ] action publique($) —> gap ; séparées selon le type de mesure
+- [x] action publique($) —> séparé selon le type de mesure et avec le total (valuation selon l'EIA)
 - [ ] nature du possesseur (privé, état, entreprise) ? ---> analyse de variance
-- [ ] accès au parking ?
 
 _check when the data has been imported on the repository_
 
 
-### About ours methods of statistical analysis 
+### About ours goals for the statistical and econometric analysis 
 
-__Here are the diferent data we aim to work on__ : 
-- [ ] Trouver des sources de documents
-- [ ] statistique descriptives: moy et écart type des principales variables
+__Here are the diferent methods we aim to implement __ : 
+- [x] statistique descriptives: moy et écart type des principales variables
 - [x] analyse en composantes principales (R)
-- [ ] méthodes de classification automatique pour représenter les données et émettre des hypothèses de dépendance entre certaines variables --> cluster, k-means (R) --> états plus ou moins écolo : à corréler avec des variables quantitatives (rep, dem, ...) --> test du chi 2 pour voir si même cluster
+- [x] méthodes de classification automatique pour représenter les données et émettre des hypothèses de dépendance entre certaines variables --> cluster, k-means (R) 
+- [ ] états plus ou moins écolo : corréler les cluster avec des variables quantitatives (rep, dem, ...) --> test du chi 2 pour voir si même cluster
 - [ ] test d'adéquation des données à une loi ou à une famille de loi (selon la nature des données, test du chi-2, tests de normalité, test de Kolmogorov) (juste pour une partie not. facteurs sociaux)
 - [ ] estimation des paramètres par intervalles de confiance --> surtout pour les résultat de la régression linéaire --> 50 var assez
 - [ ] analyse de variance à un facteur pour des échantillons multiples --> hypothese gaussienne ou test d'homogénéité non paramétrique mais avec seulement 2 types de données (sur le type de flotte)
@@ -66,6 +66,9 @@ __Here are the diferent data we aim to work on__ :
 _check when the method have been applied through one of the repository files_
 
 
-### About ours methods of econometric analysis 
+### About the revue of existing paper on the subject 
 
-...
+__Here are the diferent goals we aim to work on__ : 
+- [ ] Trouver des sources de documents
+- [ ] Resumer les differentes methodes mises en oeuvre (théorier et pratique)
+- [ ] Comparer les résultats extérieurs aux notres

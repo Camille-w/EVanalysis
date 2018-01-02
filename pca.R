@@ -1,13 +1,16 @@
 #On efface les variables en mémoire, permet de faire le ménage avant de commencer
 rm(list=ls())
+
+###################################################################
+########################################### chargement des données
+
 # ouverture des données
 data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
 
 ######## les donnees chargees viennent de DataEasyNameOnlyStates.csv
 # car il faut des noms de colonne sans espace et plus court
 # car on enlève la variable globale USA
-# car dans cette table, elles ont ete renormalisee
-# si on met les vraies valeurs ma PCA est faussee par l'importance d'un revenu annuel face a une pourcentage
+# dans la suite les valeurs seront renormalisées (pour etre comparables) dans les fonctions
 
 # table de donnee de type data.frame
 class(data_tab) 
@@ -23,14 +26,18 @@ data=data[1:51,c(4,5,6,8,9,11,13)]
 ### on renome les lignes d'après les etats associes
 rownames(data)=c("ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", "WISCONSIN", "WYOMING")
 
-#### analyse en composantes principales sur la totalité des données
+
+###################################################################
+############## analyse en composantes principales sur la selection
 
 ## on verifie que pas de NULL --> OK
 any(is.na(data))
 ## on verifie que c'est des nombres --> OK
 any(is.numeric(data))
+
 ## on fait la pca
 library("FactoMineR")
+# pca avec normalisation (scale=TRUE)
 pca=PCA(data, scale.unit = TRUE, ncp = 5, graph = TRUE)
 ## et on regarde comme elle est repartie (graph=TRUE)
 #install.packages("corrplot")
@@ -77,4 +84,15 @@ fviz_pca_var(pca,col.var = "contrib",gradient.cols = c("#00AFBB", "#E7B800", "#F
 ## Biplot des individus et des variables
 fviz_pca_biplot(pca, repel = TRUE,col.var = "#2E9FDF",col.ind = "#696969")
 
+###################################################################
+############# en vue de l'enregistrement automatique des resultats
 
+# a completer avec les noms des graphes une fois ceux a enregistrer choisis
+
+# dans un nouveau  pdf
+#pdf ("PCA.pdf") 
+#print (myplot)
+#dev.off ()
+
+# dans plusieurs nouveau png
+#ggexport (plotlist = list(myplot1, myplot2, myplot3),filename = "PCA.png")
