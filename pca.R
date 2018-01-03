@@ -19,7 +19,7 @@ class(data_tab)
 data=data.matrix(data_tab)
 #data=data[1:51,3:12]
 #data=data[1:51,c(4,5,6,8,9,10,11,12,13)]
-data=data[1:51,c(4,5,6,8,9,11,13)]
+data=data[1:51,c(4,5,6,8,9,11,13,14,15,23)]
 # on enleve les colonnes 1,2,3 : info gen inutiles pour pca 
 # et 7 pour garder un seul revenu
 # et 10,12 pour garder un seul niveau de diplome
