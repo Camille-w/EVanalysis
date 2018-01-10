@@ -26,7 +26,7 @@ Ce projet contient les fichiers suivants (en gras les fichiers clés) :
 * individualsPCA.png : la PCA avec les noms des etas, coloree par niveau de représentation
 * pca.R : analyses des donnees de type PCA, (normalisee automatiquement, selection des colonnes)
 * PCA00i.png : résultat du programme de PCA en image automatiquement générées
-* __pcaCluster.R : PCA normalisee et plusieurs analyse de clustering (avec leur pertinence) et comparaison aux cluster de parti, ...__
+* __pcaCluster.R : PCA normalisee et plusieurs analyse de clustering (avec leur pertinence) et comparaison aux cluster de parti, et test du chi2 homogénéité et indépendance entre cluster ...__
 * plot.R : affichage du scatter plot et de plusieurs regressions "interessantes"
 * __plotData.png : scatter plot des donnees__
 * __radar.R : tracé des diagrammes radar (ou en étoile) pour chacun de états (plusieurs par fenetres)__
@@ -67,7 +67,7 @@ __Here are the diferent methods we aim to implement (dans l'ordre)__ :
 - [x] méthodes de classification automatique pour représenter les données et émettre des hypothèses de dépendance entre certaines variables --> cluster, k-means (R) 
 - [x] états plus ou moins écolo : corréler les cluster avec des variables quantitatives (rep, dem, ...)
 - [x] PCA et clustering sur l'action publique
-- [ ] test du chi 2 pour voir si même cluster (definis et obtenus)
+- [x] test du chi 2 pour voir si même cluster (definis et obtenus)
 
 - [x] regressions lineaires multiples sur plusieurs modele
 - [ ] determination du modele ideal de regression lineaire multiple 

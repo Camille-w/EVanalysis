@@ -80,7 +80,7 @@ fviz_nbclust(scale(data), kmeans, method = "wss")+labs(subtitle = "Elbow method"
 library("NbClust")
 mynbclust=NbClust(scale(data),distance = "euclidean", min.nc = 2, max.nc = 10, method = "complete", index ="all") 
 bestCluster2 = fviz_nbclust(mynbclust, ggtheme = theme_minimal())
-### conseil 3 cluster
+### conseil 2 cluster
 
 # le desire 
 nbgr=2
@@ -121,31 +121,75 @@ print(cluster_ind)
 #### hierarchical clustering : creating a dendogram
 
 # we scale the data and then compute the dissimilarity matrix and the hierachical clustering
-myhc =hclust(dist(scale(data),method = "euclidean"),method = "ward.D2") 
+myhc = hclust(dist(scale(data),method = "euclidean"),method = "ward.D2") 
 # Visualize : Cut in nbgr groups and color by groups
 dendogram = fviz_dend(myhc, k = nbgr, cex = 0.5, k_colors = "jco", color_labels_by_k = TRUE, rect = TRUE)
 
 # Inspect the silhouette plot
-myhc=eclust(scale(data),"hclust", k = nbgr, graph = FALSE)
-fviz_silhouette(myhc)
-fviz_dend(myhc, palette = "jco",rect = TRUE, show_labels = TRUE)
+myhc2=eclust(scale(data),"hclust", k = nbgr, graph = FALSE)
+fviz_silhouette(myhc2)
+fviz_dend(myhc2, palette = "jco",rect = TRUE, show_labels = TRUE)
 
 ###################################################################
 ################## comparaison avec les cluster politique et ecolo
+COL=colorRampPalette(c("blue","red","grey"))(max(3,nbgr)) 
 
 party=as.factor(dataCluster[1:51,1])
 fviz_pca_ind(pca,col.ind=party,palette = c("blue","purple","red"),addEllipses = FALSE,repel = TRUE, legend.title = "Cluster")
 fviz_pca_biplot(pca, repel = TRUE,col.var = "black",col.ind = party, palette = c("blue","purple","red"))
-
 fviz_pca_ind(pca, fill.ind = grp, col.ind = party,pointshape = 21,pointsize = "cos2",palette = "jco",addEllipses = TRUE,repel = TRUE)
+
+# pour la cohérence de la palette, on change un peu party : 1-->2 (jaune) et 3-->1 (bleu) 2-->3 (gris)
+for (i in 1:51){
+  if(party[i]==2){ # non partisan
+    party[i]=3 # grey
+  }
+  else{
+    if(party[i]==1){ # democrat
+      party[i]=2 # yellow
+    }
+    else{ #(party[i]==3) # republican
+      party[i]=1 # blue
+    }
+  }
+}
+compareWparty = fviz_pca_ind(pca, fill.ind = grp, col.ind = party,pointshape = 21,pointsize = "cos2",palette = "jco",addEllipses = TRUE,repel = TRUE, title="Comparaison avec la politique")
+print(compareWparty)
 #fviz_dend(myhc, k = nbgr, cex = 0.5, k_colors = "Dark2", label_cols=party, rect = TRUE)
 
 ecolo=as.factor(dataCluster[1:51,4])
 fviz_pca_ind(pca,col.ind=ecolo,palette = c("grey","green","blue"),addEllipses = FALSE,repel = TRUE, legend.title = "Cluster")
 fviz_pca_biplot(pca, repel = TRUE,col.var = "black",col.ind = ecolo, palette = c("grey","green","blue"))
 
-fviz_pca_ind(pca, fill.ind = grp, col.ind = ecolo,pointshape = 21,pointsize = "cos2",palette = "jco",addEllipses = TRUE,repel = TRUE)
+compareWecolo = fviz_pca_ind(pca, fill.ind = grp, col.ind = ecolo,pointshape = 21,pointsize = "cos2",palette = "jco",addEllipses = TRUE,repel = TRUE, title="Comparaison avec l'écologie")
+print(compareWecolo)
 #fviz_dend(myhc, k = nbgr, cex = 0.5, k_colors = "Dark2", label_cols=ecolo, rect = TRUE)
+
+############### mise en place de tests du khi 2 de conformité et d'indépendance
+
+########## goodness-of-fit Test
+# H0 = proba que les 2 clusters diffèrent
+# p-value = proba de non-validation de H0 = proba de conformité théorie-observation
+grp = as.numeric(grp)
+party = as.numeric(party)
+ecolo = as.numeric(ecolo)
+testPartyGoF = chisq.test(grp, p=party/sum(party)) # p-value = 1
+testEcoloGoF = chisq.test(grp, p=ecolo/sum(ecolo)) # p-value = 1
+
+########## Pearson's chi-squared test
+# H0 = le fait de connaître  l'appartenance d'un individu à une population (selon un critère) ne donne aucun indice sur la caractéristique qui le défini selon l'autre critère
+# p-value = proba de validation de H0 = proba que aucun lien entre critères
+testPartyIndep = chisq.test(as.table(rbind(grp,party))) # p-value = 1
+testEcoloIndep = chisq.test(as.table(rbind(grp,ecolo))) # p-value = 1
+#test3Indep = chisq.test(as.table(rbind(grp,party,ecolo))) # p-value = 1
+
+#testPartyIndep$method #: le type de test effectué 
+#testPartyIndep$statistic #: la statistique du Chi2.
+#testPartyIndep$parameter #: le nombre de degrés de libertés.
+#testPartyIndep$p.value #: la p-value.
+#testPartyIndep$observed #: la matrice observée de départ.
+#testPartyIndep$expected #: la matrice attendue sous l'hypothèse nulle d'absence de biais.
+#testPartyIndep$residuals #: le tableau des résidus 
 
 ###################################################################
 #################### clustering sur les mesures d'action publiques
@@ -190,4 +234,5 @@ library(ggpubr)
 #ggexport (plotlist = list(myplot1, myplot2, myplot3),filename = "PCA.png")
 ggexport (plotlist = list(Var_contribution, Var_representation, PCAbiplot,PCAindividus,PCAvar),filename = "PCA.png")
 ggexport (plotlist = list(bestCluster1, bestCluster2, cluster_biplot, cluster_ind,dendogram),filename = "Cluster.png")
+ggexport (plotlist = list(compareWparty, compareWecolo),filename = "CompareCluster.png")
 
