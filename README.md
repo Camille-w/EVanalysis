@@ -21,7 +21,7 @@ Ce projet contient les fichiers suivants (en gras les fichiers clés) :
 * DataEasyName.csv : la table AllData.csv avec de noms de colonnes utilisables pour R (espaces, ...)
 * __DataEasyNameOnlyStates.csv : DataEasyName.csv sans la valeur pour USA en totalite__
 * DataEasyNameRenorm.csv : les donnees renormalisees manuellement (inutile car scale)
-* Description_classique.R : resumé descriptif et histogrammes avec densité
+* __Description_classique.R : resumé descriptif et histogrammes avec densité__
 * EVanalysis.Rproj : groupement en projet R des fichiers du repertoire
 * individualsPCA.png : la PCA avec les noms des etas, coloree par niveau de représentation
 * pca.R : analyses des donnees de type PCA, (normalisee automatiquement, selection des colonnes)
