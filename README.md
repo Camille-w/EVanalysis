@@ -19,19 +19,19 @@ Ce projet contient les fichiers suivants (en gras les fichiers clés) :
 * Biplot.png : le Biplot associé à la PCA (etat, et vecteu valeur)
 * Cluster00i.png : résultat du programme de clustering en image automatiquement générées
 * DataEasyName.csv : la table AllData.csv avec de noms de colonnes utilisables pour R (espaces, ...)
-* __ DataEasyNameOnlyStates.csv : DataEasyName.csv sans la valeur pour USA en totalite __
+* __DataEasyNameOnlyStates.csv : DataEasyName.csv sans la valeur pour USA en totalite__
 * DataEasyNameRenorm.csv : les donnees renormalisees manuellement (inutile car scale)
 * Description_classique.R : resumé descriptif et histogrammes avec densité
 * EVanalysis.Rproj : groupement en projet R des fichiers du repertoire
 * individualsPCA.png : la PCA avec les noms des etas, coloree par niveau de représentation
 * pca.R : analyses des donnees de type PCA, (normalisee automatiquement, selection des colonnes)
 * PCA00i.png : résultat du programme de PCA en image automatiquement générées
-* __ pcaCluster.R : PCA normalisee et plusieurs analyse de clustering (avec leur pertinence) et comparaison aux cluster de parti, ... __
+* __pcaCluster.R : PCA normalisee et plusieurs analyse de clustering (avec leur pertinence) et comparaison aux cluster de parti, ...__
 * plot.R : affichage du scatter plot et de plusieurs regressions "interessantes"
-* __ plotData.png : scatter plot des donnees __
-* __ radar.R : tracé des diagrammes radar (ou en étoile) pour chacun de états (plusieurs par fenetres) __
-* __ README.md : description du projet, des données, des méthodes __
-* __ regression.R : premiere version de regressions lineaire et log-linéaire multiples sur plusieurs modeles __
+* __plotData.png : scatter plot des donnees__
+* __radar.R : tracé des diagrammes radar (ou en étoile) pour chacun de états (plusieurs par fenetres)__
+* __README.md : description du projet, des données, des méthodes__
+* __regression.R : premiere version de regressions lineaire et log-linéaire multiples sur plusieurs modeles__
 * ...
 
 ### About our data (2016 values)
@@ -54,7 +54,7 @@ _check when the data has been imported on the repository_
 
 ### About ours goals for the statistical and econometric analysis 
 
-__Here are the diferent methods we aim to implement (dans l'ordre) __ : 
+__Here are the diferent methods we aim to implement (dans l'ordre)__ : 
 
 - [x] statistique descriptives: moy, quantiles, médiane, écart type, ... des principales variables
 - [x] statistique descriptives: histogramme avec densité des principales variables 
