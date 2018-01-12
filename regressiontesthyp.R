@@ -4,8 +4,9 @@ rm(list=ls())
 ########################################### chargement des données
 
 # ouverture des données
-lien="C:\\Users\\thibaut\\Documents\\Ponts_2A\\Voiture_Electrique\\telechargement2\\EVanalysis-master\\EVanalysis-master\\DataEasyNameOnlyStates.csv"
-data_tab=read.table(lien,header=TRUE,sep=";", dec=",")
+#lien="C:\\Users\\thibaut\\Documents\\Ponts_2A\\Voiture_Electrique\\telechargement2\\EVanalysis-master\\EVanalysis-master\\DataEasyNameOnlyStates.csv"
+#data_tab=read.table(lien,header=TRUE,sep=";", dec=",")
+data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
 class(data_tab) #data frame
 # matrice de données
 data=data.matrix(data_tab)
@@ -50,8 +51,13 @@ plot(model)
 sink(file="A.txt") 
 
 sink()
-q()
+#q()
 
+#install.packages("car")
+#install.packages("lmtest")
+library(lmtest)
+hmctest(model)
+# HMC = 0.7096, p-value = 0.991
+dwtest(model)
+# DW = 2.0315, p-value = 0.5438
 
-#hmctest(model)
-#dwtest(model)

@@ -23,13 +23,15 @@ rownames(data_toAnalyse)= c("Max", "Min", statenames)
 
 #install.packages("fmsb")
 library(fmsb)
-
-par(mfrow = c(3, 3), mar = c(1,1,1,1)) 
-for (name in statenames[1:9]){ 
-  radarchart(data_toAnalyse[c("Max", "Min", name),], axistype = 2, seg = 10, plty=1, maxmin = TRUE, title = name) 
-}
-
 COL=colorRampPalette(c("firebrick","cadetblue","chocolate","burlywood","chartreuse","darkmagenta","aquamarine","forestgreen","blueviolet","darkgoldenrod","cornflowerblue","coral","darkseagreen","deeppink","gold","darkred"))(51) 
+
+# pauvres et moins impliqués : Tennessee, Mississippi, South Dakota, South Carolina, Kentucky, Arkansas, Alabama …
+# forte action publique et des effets : Californie, Hawaii, Oregon, Washington, Columbia …
+# forte action publique sans beaucoup d’effet : Maryland, Idaho, Connecticut, Colorado, Delaware, Texas …
+name = "TEXAS"
+i = 42
+radarchart(data_toAnalyse[c("Max", "Min", name),], axistype = 2, seg = 10, pcol = COL[i], cglcol = "grey80", plty=1, maxmin = TRUE, title = name)
+
 par(mfrow = c(3, 3), mar = c(1,1,1,1))
 for (i in 3:11){ 
   radarchart(data_toAnalyse[c(1,2,i),], axistype = 2, seg = 10, pcol = COL[i-2], cglcol = "grey80", plty=1, maxmin = TRUE, title = rownames(data_toAnalyse[i,])) 

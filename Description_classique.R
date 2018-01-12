@@ -31,8 +31,12 @@ resume(Population)
 resume(PEVRegistrations)
 resume(TotalChargingUnits)
 resume(FastChargingUnits)
-resume(RevisedAnnualPersonalIncomePerCapita)
-
+resume(MedianHouseholdIncome)
+resume(PercentOfBachelorDegree)
+resume(AverageRetailPriceOfElectricity)
+resume(ResidentialEnergyConsumedPerCapita)
+resume(RegularGasolinePrice)
+resume(TotalPublicActionForEV)
 
 ########################## compléments : fonctions automatiques de R
 data=data.matrix(data_tab)
