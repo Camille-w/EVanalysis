@@ -50,9 +50,26 @@ clusterIncentivesGrouped=as.factor(kmeans(scale(dataIncentivesGrouped), centers 
 ##################################### regression lineaire multiple
 # the regressions with their results and main statistics
 
+#### pour un model note reg1 on peut acceder a :
+# les coefficients du modele
+#coefficients(reg1)
+# Intervalles de consifance des paramètre du modele 
+#confint(reg1, level=0.95) 
+# valeurs predites
+#fitted(reg1) 
+# residus
+#residuals(reg1)
+# table d'analyse de variance
+#anova(reg1)  
+# matrice de covariance pour les parametres du modele
+#vcov(reg1)  
+# diagnostics de regression 
+#influence(reg1) 
+
+##########################################################
 ######## Actions Publiques toutes regroupees
 
-## function de l'action publique
+## function que de l'action publique
 regAP = lm(PEVRegistrations ~ TotalPublicActionForEV, data=data_tab)
 summary(regAP)
 
@@ -130,6 +147,8 @@ an1 = anova(m1)
 an2 = anova(m2)
 fcrit=qf(.95,df1=m1$df,df2=m2$df)
 Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+print(Chow_Statistic)
+print(fcrit)
 # pas de structural break
 ### sur le parti politique
 m1=lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
@@ -143,44 +162,83 @@ an1 = anova(m1)
 an2 = anova(m2)
 fcrit=qf(.95,df1=m1$df,df2=m2$df)
 Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+print(Chow_Statistic)
+print(fcrit)
 # structural break !!!
-
-
-######## Actions Publiques toutes separees
-
-## function of all variables
-regallType = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
-                + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
-summary(regallType) 
-
-## function de l'action publique par mesure
-regIncType = lm(PEVRegistrations ~ IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
-summary(regIncType) 
-
-### comparaison de modeles
-anova(regInc,regIncType)
-
-# les coefficients du modele
-#coefficients(reg1)
-# Intervalles de consifance des paramètre du modele 
-#confint(reg1, level=0.95) 
-# valeurs predites
-#fitted(reg1) 
-# residus
-#residuals(reg1)
-# table d'analyse de variance
-#anova(reg1)  
-# matrice de covariance pour les parametres du modele
-#vcov(reg1)  
-# diagnostics de regression 
-#influence(reg1) 
 
 # diagnostic plots (les 4 graphes sur la meme fenetre) 
 layout(matrix(c(1,2,3,4),2,2))  
-plot(reg1)
+plot(regall)
+plot(regall3)
 # provide checks for heteroscedasticity, normality, and influential observerations.
 
+##########################################################
+######## Actions Publiques toutes separees
 
+## function que de l'action publique par mesure
+regIncType = lm(PEVRegistrations ~ IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
+summary(regIncType) 
+
+## function of all variables
+regallbyType = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
+                + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection, data=data_tab)
+summary(regallbyType) 
+
+# selection du meilleur modele inclut dans regall par coeffs de Mallow
+mallowbyType = leaps(x=data_tab[,c(5,6,8,11,13,14,15,16,17,18,19,20,21)],y=data_tab[,4], 
+               names=colnames(data_tab)[c(5,6,8,11,13,14,15,16,17,18,19,20,21)], method="Cp",nbest=5)
+plot(mallowbyType$size,mallowbyType$Cp)
+min(mallowbyType$Cp) 
+# 5.609269 : le n°26
+mallowbyType$which[26,]
+# on enleve ce qui est indique : FastChargingUnits, MedianHouseholdIncome, ...
+regallbyType2 = regallbyType
+regallbyType2 = update(regallbyType2,  ~ .-FastChargingUnits-MedianHouseholdIncome-PercentOfBachelorDegree-ResidentialEnergyConsumedPerCapita-IncomeTaxCredit-SalesTax-EmissionInspection)
+summary(regallbyType2)
+
+# on compare le modele epure choisi a l'original
+anova(regallbyType,regallbyType2)
+
+#### test de la stabilite structurelle : Chow
+sctest(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+         RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+       type="Chow", data = data_tab)
+# pas de structural break
+### sur le type de politique publique
+m1=lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+        RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+      data = data_tab[ which(clusterIncentives==2), ])
+m2=lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+        RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+      data = data_tab[ which(clusterIncentives==1 | clusterIncentives==3 | clusterIncentives==4), ])
+an0 = anova(regall3)
+an1 = anova(m1)
+an2 = anova(m2)
+fcrit=qf(.95,df1=m1$df,df2=m2$df)
+Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+print(Chow_Statistic)
+print(fcrit)
+# pas de structural break
+### sur le parti politique
+m1=lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+        RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+      data = data_tab[ which(party==1), ])
+m2=lm(PEVRegistrations ~ PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+        RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+      data = data_tab[ which(party==2 | party==3), ])
+an0 = anova(regall3)
+an1 = anova(m1)
+an2 = anova(m2)
+fcrit=qf(.95,df1=m1$df,df2=m2$df)
+Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+print(Chow_Statistic)
+print(fcrit)
+# pas de structural break
+
+
+##########################################################
+### comparaison de modeles
+anova(regInc,regIncType)
 
 # Stepwise model selection by exact AIC in the Regression
 library(MASS)
