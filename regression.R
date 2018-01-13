@@ -16,25 +16,45 @@ dataIncentives=data[1:51,c(16,17,18,19,20,21)]
 dataIncentives[1:51,1]=dataIncentives[1:51,1]-7500 # on ne garde que le federal
 dataCluster=data[1:51,24:27]
 data=data[1:51,c(4,5,6,8,11,13,14,15,23)]
+# on regroupe les actions publiques selon 2 groupe : effet lors de l'achat ou de l'usage
+dataIncentivesGrouped=dataIncentives[1:51,c(1,4)]
+dataIncentivesGrouped[1:51,1]=dataIncentives[1:51,1]+dataIncentives[1:51,2]+dataIncentives[1:51,3] 
+dataIncentivesGrouped[1:51,2]=dataIncentives[1:51,4]+dataIncentives[1:51,5]+dataIncentives[1:51,6]
+colnames(dataIncentivesGrouped)=c("mesure à l'achat","mesure à l'usage")
 
 rownames(dataIncentives)=c("ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", "WISCONSIN", "WYOMING")
 rownames(dataCluster)=c("ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", "WISCONSIN", "WYOMING")
 rownames(data)=c("ALABAMA", "ALASKA", "ARIZONA", "ARKANSAS", "CALIFORNIA", "COLORADO", "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA", "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY", "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN", "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA", "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW YORK", "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON", "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA", "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON", "WEST VIRGINIA", "WISCONSIN", "WYOMING")
 
 ###################################################################
-##################################### regression lineaire multiple
+##################################### rappel des clusters obtenus
 
+### depuis les données
+# cluster politique
+party=as.factor(dataCluster[1:51,1])
+# cluster ecolo
+ecolo=as.factor(dataCluster[1:51,4])
+### avec KMeans (cf pcaCluster.R)
+# cluster de tendance global sur les donnees de data
+clusterGlobal=as.factor(kmeans(scale(data), centers = 2, nstart = 25)$cluster)
+# cluster de tendance global sur les donnees d'action publique
+clusterIncentives=as.factor(kmeans(scale(dataIncentives), centers = 4, nstart = 25)$cluster)
+# calcul d'un cluster de tendance global sur les donnees d'action publique regroupees en 2
+# sur ces donnees regroupees, nombre optimal de 3 cluster 
+clusterIncentivesGrouped=as.factor(kmeans(scale(dataIncentivesGrouped), centers = 3, nstart = 25)$cluster)
+# 1 = beacoup achat et assez peu usage ; 2 = très peu achat et peu usage ; 3 = beaucoup usage
+# plot(dataIncentivesGrouped, col = clusterIncentivesGrouped)
+
+###################################################################
+##################################### regression lineaire multiple
 # the regressions with their results and main statistics
 
-## function of all variables
+######## Actions Publiques toutes regroupees
+
+## toutes les autres variables comprises, tout etat confondu
 #regall = lm(data[1:51,1] ~ data[1:51,2] + data[1:51,3] + data[1:51,4] + data[1:51,5] + data[1:51,6] + data[1:51,7] + data[1:51,8] + data[1:51,9])
 regall = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data=data_tab)
 summary(regall) 
-
-## function of all variables
-regallType = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
-                + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
-summary(regallType) 
 
 ## function of certain variables
 ## on enlève FastChargingUnits et AverageRetailPriceOfElectricity, ResidentialEnergyConsumedPerCapita
@@ -44,6 +64,30 @@ summary(reg1)
 ## function de l'action publique
 regInc = lm(PEVRegistrations ~ TotalPublicActionForEV, data=data_tab)
 summary(regInc)
+
+## separement selon les cluster d'action publique
+# les cluster sont trop petits pour lm : des NA apparaissent 
+# les donnees extraites et les regressions associees 
+#VeryLittle1 = data_tab[ which(clusterIncentives==2), ]
+#PurchaseRebateandMix = data_tab[ which(clusterIncentives==3), ]
+#HOVandIcomeTax = data_tab[ which(clusterIncentives==4), ]
+#SalesTax = data_tab[ which(clusterIncentives==1), ]
+#VeryLittle = data_tab[ which(clusterIncentivesGrouped==1), ]
+#WithUse = data_tab[ which(clusterIncentivesGrouped==2), ]
+#AtPurchase = data_tab[ which(clusterIncentivesGrouped==3), ]
+# les regressions ne fonctionnent pas sur la plupart de ces sous-groupes
+# donnent beacoup de NA car peu de points donc plus de points tres aberrants (singularities)
+#summary(lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data=data_tab[ which(clusterIncentivesGrouped==2 | clusterIncentivesGrouped==3), ]))
+
+### pas de groupes de cluster sur l'action publique ayant une signification et fonctionnant avec lm pour ce model
+
+
+######## Actions Publiques toutes separees
+
+## function of all variables
+regallType = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
+                + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
+summary(regallType) 
 
 ## function de l'action publique par mesure
 regIncType = lm(PEVRegistrations ~ IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=data_tab)
@@ -141,4 +185,25 @@ lndata_tab$TotalPublicActionForEV=log(lndata_tab$TotalPublicActionForEV)
                 #+ TotalPublicActionForEV, data=lndata_tab)
                 ####+ IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=lndata_tab)
 #summary(lnregallType) 
+
+
+###################################################################
+###################################### En plus, a preciser si time
+# librairies additionnelles pour regresser par subsets selon un vecteur
+
+#library(nlme)
+#lmList(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV | clusterIncentives, data=data_tab)
+# bof ... donne beaucoup de NA : why ? + peu d'infos
+#library(plyr)
+#models=dlply(data_tab, clusterIncentives, function(df) lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data = df))
+#ldply(models, coef)
+#l_ply(models, summary, .print = TRUE)
+# bof ... donne beaucoup de NA : why ?
+#library(dplyr)
+#models = data_tab %>% group_by(Party) %>% do(model = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data = .))
+#models$model
+#library(broom)
+#models %>% tidy(model)
+#models %>% glance(model)
+# why not mais juste sur colonnes du data.frame et pas assez précis
 
