@@ -7,6 +7,7 @@ rm(list=ls())
 # ouverture des données
 data_tab=read.table("DataEasyNameOnlyStates.csv",header=TRUE,sep=";", dec=",")
 class(data_tab) 
+attach(data_tab)
 # matrice de données
 data=data.matrix(data_tab)
 #data=data[1:51,c(4,5,6,8,9,11,13,14,15,16,17,18,20,21,22)]
@@ -51,19 +52,45 @@ clusterIncentivesGrouped=as.factor(kmeans(scale(dataIncentivesGrouped), centers 
 
 ######## Actions Publiques toutes regroupees
 
+## function de l'action publique
+regAP = lm(PEVRegistrations ~ TotalPublicActionForEV, data=data_tab)
+summary(regAP)
+
 ## toutes les autres variables comprises, tout etat confondu
 #regall = lm(data[1:51,1] ~ data[1:51,2] + data[1:51,3] + data[1:51,4] + data[1:51,5] + data[1:51,6] + data[1:51,7] + data[1:51,8] + data[1:51,9])
 regall = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data=data_tab)
 summary(regall) 
 
-## function of certain variables
-## on enlève FastChargingUnits et AverageRetailPriceOfElectricity, ResidentialEnergyConsumedPerCapita
-reg1 = lm(PEVRegistrations ~ TotalChargingUnits + TotalPublicActionForEV + MedianHouseholdIncome + PercentOfBachelorDegree + RegularGasolinePrice, data=data_tab)
-summary(reg1)
+## mise a jour manuelle en enlevant les elements peu significatifs
+regall2 = regall
+regall2 = update(regall2,  ~ .-FastChargingUnits)
+summary(regall2)
+regall2 = update(regall2,  ~ .-MedianHouseholdIncome)
+summary(regall2)
+regall2 = update(regall2,  ~ .-AverageRetailPriceOfElectricity)
+summary(regall2)
+regall2 = update(regall2,  ~ .-PercentOfBachelorDegree)
+summary(regall2)
+regall2 = update(regall2,  ~ .-ResidentialEnergyConsumedPerCapita)
+summary(regall2)
 
-## function de l'action publique
-regInc = lm(PEVRegistrations ~ TotalPublicActionForEV, data=data_tab)
-summary(regInc)
+# selection du meilleur modele inclut dans regall par coeffs de Mallow
+library(leaps)
+mallow = leaps(x=data[,2:9],y=data[,1], 
+               names=c("TotalChargingUnits","FastChargingUnits","MedianHouseholdIncome","PercentOfBachelorDegree","AverageRetailPriceOfElectricity",
+                       "ResidentialEnergyConsumedPerCapita","RegularGasolinePrice","TotalPublicActionForEV"),
+               method="Cp",nbest=5)
+plot(mallow$size,mallow$Cp)
+min(mallow$Cp) 
+# 6.477762 : le n°21
+mallow$which[21,]
+# indique d'enlever MedianHouseholdIncome AverageRetailPriceOfElectricity FastChargingUnits
+regall3 = regall
+regall3 = update(regall3,  ~ .-FastChargingUnits-MedianHouseholdIncome-AverageRetailPriceOfElectricity)
+summary(regall3)
+
+# on compare le modele epure choisi a l'original
+anova(regall,regall3)
 
 ## separement selon les cluster d'action publique
 # les cluster sont trop petits pour lm : des NA apparaissent 
@@ -78,8 +105,45 @@ summary(regInc)
 # les regressions ne fonctionnent pas sur la plupart de ces sous-groupes
 # donnent beacoup de NA car peu de points donc plus de points tres aberrants (singularities)
 #summary(lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data=data_tab[ which(clusterIncentivesGrouped==2 | clusterIncentivesGrouped==3), ]))
-
 ### pas de groupes de cluster sur l'action publique ayant une signification et fonctionnant avec lm pour ce model
+
+#### test de la stabilite structurelle : Chow
+#install.packages("strucchange")
+library(strucchange)
+sctest(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
+         + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+         + TotalPublicActionForEV, type="Chow", data = data_tab)
+# pas de structural break
+# possible de remplacer type="Chow" par type="Rec-CUSUM" ou par type="Nyblom-Hansen"
+#library(gap)
+#chow.test(data_tab[ which(clusterIncentives==2), 4],data_tab[ which(clusterIncentives==2), c(5,11,14,15,23)],data_tab[ which(clusterIncentives==1 | clusterIncentives==3 | clusterIncentives==4), 4],data_tab[ which(clusterIncentives==1 | clusterIncentives==3 | clusterIncentives==4), c(5,11,14,15,23)])
+# not working ...
+### sur le type de politique publique
+m1=lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
+        ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+        TotalPublicActionForEV, data = data_tab[ which(clusterIncentives==2), ])
+m2=lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
+        ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, 
+      data = data_tab[ which(clusterIncentives==1 | clusterIncentives==3 | clusterIncentives==4), ])
+an0 = anova(regall3)
+an1 = anova(m1)
+an2 = anova(m2)
+fcrit=qf(.95,df1=m1$df,df2=m2$df)
+Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+# pas de structural break
+### sur le parti politique
+m1=lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
+        ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+        TotalPublicActionForEV, data = data_tab[ which(party==1), ])
+m2=lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
+        ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, 
+      data = data_tab[ which(party==2 | party==3), ])
+an0 = anova(regall3)
+an1 = anova(m1)
+an2 = anova(m2)
+fcrit=qf(.95,df1=m1$df,df2=m2$df)
+Chow_Statistic=((an0[6,2]-(an1[6,2]+an2[6,2]))/6)/((an1[6,2]+an2[6,2])/(m1$df+m2$df-(2*6)))
+# structural break !!!
 
 
 ######## Actions Publiques toutes separees
