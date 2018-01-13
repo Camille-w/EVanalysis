@@ -218,6 +218,8 @@ fviz_pca_biplot(pcaIncentives,fill.ind = grpIncentives, col.ind = "black", point
 myhcIncentives =hclust(dist(scale(dataIncentives),method = "euclidean"),method = "ward.D2") 
 fviz_dend(myhcIncentives, k = nbgrIncentives, cex = 0.5, k_colors = "jco", color_labels_by_k = TRUE, rect = TRUE)
 
+### temporaire pour avoir les noms par groupes
+#for (i in 1:51){if (grpIncentives[i]==4){print(names(grpIncentives[i]))}}
 
 ###################################################################
 ############# en vue de l'enregistrement automatique des resultats
