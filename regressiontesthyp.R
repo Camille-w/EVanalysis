@@ -48,9 +48,8 @@ shapiro.test(model.res)
 par(mfrow =c(2, 2),oma=c(0, 0, 2, 0))
 plot(model)
 
-sink(file="A.txt") 
-
-sink()
+#sink(file="A.txt") 
+#sink()
 #q()
 
 #install.packages("car")

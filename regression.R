@@ -169,8 +169,18 @@ print(fcrit)
 # diagnostic plots (les 4 graphes sur la meme fenetre) 
 layout(matrix(c(1,2,3,4),2,2))  
 plot(regall)
-plot(regall3)
+plot(regall3, sub.caption = "Diagnostic plots pour le modele (1*)")
 # provide checks for heteroscedasticity, normality, and influential observerations.
+
+## Heteroscedasticity test
+# Breush Pagan Test
+library(lmtest)
+bptest(regall3)
+# BP = 13.838, df = 5, p-value = 0.01667
+library(car)
+ncvTest(regall3)
+# Chisquare = 53.22594    Df = 1     p = 2.973063e-13
+
 
 ##########################################################
 ######## Actions Publiques toutes separees
@@ -223,7 +233,7 @@ print(fcrit)
 m1=lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
         RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
       data = data_tab[ which(party==1), ])
-m2=lm(PEVRegistrations ~ PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+m2=lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
         RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
       data = data_tab[ which(party==2 | party==3), ])
 an0 = anova(regall3)
@@ -235,7 +245,25 @@ print(Chow_Statistic)
 print(fcrit)
 # pas de structural break
 
+# diagnostic plots (les 4 graphes sur la meme fenetre) 
+layout(matrix(c(1,2,3,4),2,2))  
+plot(regallbyType)
+plot(regallbyType2, sub.caption = "Diagnostic plots pour le modele (2*)")
+# provide checks for heteroscedasticity, normality, and influential observerations.
 
+## Heteroscedasticity test
+# Breush Pagan Test
+library(lmtest)
+bptest(regallbyType2)
+# BP = 18.971, df = 6, p-value = 0.004214
+library(car)
+ncvTest(regallbyType2)
+# Chisquare = 50.21008    Df = 1     p = 1.381364e-12
+
+
+
+
+##########################################################################
 ##########################################################
 ### comparaison de modeles
 anova(regInc,regIncType)
