@@ -60,3 +60,6 @@ hmctest(model)
 dwtest(model)
 # DW = 2.0315, p-value = 0.5438
 
+
+bptest(model)
+#BP = 15.426, df = 8, p-value = 0.05137
