@@ -247,6 +247,7 @@ durbinWatsonTest(regall3)
 #  1     -0.01123168      2.010111   0.976
 ### doute ... mais "true autocorrelation is greater than 0"
 
+
 ##########################################################
 ######## Actions Publiques toutes separees
 
@@ -389,27 +390,43 @@ durbinWatsonTest(regallbyType2)
 ### doute ... mais "true autocorrelation is greater than 0"
 
 
+###################################################################
+################################# Modele lineaire General
+
+regallbyTypeGLM = glm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + 
+                        MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + 
+                        ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+                        IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + 
+                        ParkingExemption + EmissionInspection, data=data_tab)
+summary(regallbyTypeGLM) 
+
+# selection d'un sous modele optimal
+library(MASS)
+stepGLM=stepAIC(regallbyTypeGLM, direction="both")
+stepGLM$anova
+summary(stepGLM)
 
 ##########################################################################
-##########################################################
-### comparaison de modeles
-anova(regInc,regIncType)
+############################ Autres méthodes de Selection de Sous-Modele
 
 # Stepwise model selection by exact AIC in the Regression
 library(MASS)
-step=stepAIC(regallType, direction="both")
-step$anova # display results
-
+######## Actions Publiques toutes regroupees
 step=stepAIC(regall, direction="both")
 step$anova
-
-
+summary(step)
+######## Actions Publiques toutes separees
+stepbyType=stepAIC(regallbyType, direction="both")
+stepbyType$anova 
+summary(stepbyType)
+### coefficients à peu près similaires ...
 
 # All Subsets Regression
 library(leaps)
 attach(mydata)
-leaps=regsubsets(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
-                 + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, 
+leaps=regsubsets(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + 
+                   AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+                   IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection, 
                  data=data_tab,nbest=10)
 # view results 
 summary(leaps)
@@ -418,20 +435,40 @@ summary(leaps)
 #plot(leaps,scale="r2")
 # plot statistic by subset size 
 library(car)
-#subsets(leaps, statistic="rsq")
+subsets(leaps, statistic="rsq")
 
+
+##########################################################################
+############################ Sur la comparaison des predicteurs 
 
 # Calculate Relative Importance for Each Predictor
 library(relaimpo)
-calc.relimp(regallType,type=c("lmg","last","first","pratt"),
+calc.relimp(regallbyType,type=c("lmg","last","first","pratt"),
             rela=TRUE)
 
 # Bootstrap Measures of Relative Importance (1000 samples) 
-boot <- boot.relimp(regallType, b = 1000, type = c("lmg","last", "first", "pratt"), 
+boot <- boot.relimp(regallbyType, b = 1000, type = c("lmg","last", "first", "pratt"), 
                     rank = TRUE, diff = TRUE, rela = TRUE)
 booteval.relimp(boot) # print result
 plot(booteval.relimp(boot,sort=TRUE)) # plot result
 
+
+###################################################################
+################################# Modele lineaire General
+
+regallbyTypeGLM = glm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + 
+                     MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + 
+                     ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+                     IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + 
+                     ParkingExemption + EmissionInspection, data=data_tab)
+summary(regallbyTypeGLM) 
+
+###################################################################
+################################# regression log-lineaire multiple
+
+regallbyTypeLog = regallbyType
+regallbyTypeLog = update(regallbyTypeLog, log(.) ~ log(.))
+summary(regallbyTypeLog)
 
 ###################################################################
 ################################# regression log-lineaire multiple
