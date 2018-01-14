@@ -124,7 +124,8 @@ anova(regall,regall3)
 #summary(lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + TotalPublicActionForEV, data=data_tab[ which(clusterIncentivesGrouped==2 | clusterIncentivesGrouped==3), ]))
 ### pas de groupes de cluster sur l'action publique ayant une signification et fonctionnant avec lm pour ce model
 
-#### test de la stabilite structurelle : Chow
+#########################
+############ test de la stabilite structurelle : Chow
 #install.packages("strucchange")
 library(strucchange)
 sctest(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree + 
@@ -166,13 +167,18 @@ print(Chow_Statistic)
 print(fcrit)
 # structural break !!!
 
+#layout(matrix(c(1,2,3,4),2,2))  
+#plot(regall)
+par(mfrow =c(2, 3),oma=c(2, 2, 2, 2))
 # diagnostic plots (les 4 graphes sur la meme fenetre) 
-layout(matrix(c(1,2,3,4),2,2))  
-plot(regall)
 plot(regall3, sub.caption = "Diagnostic plots pour le modele (1*)")
 # provide checks for heteroscedasticity, normality, and influential observerations.
+# histogramme des résidus
+hist(resid(regall3), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regall3), main = "Boxplot of Residuals")
 
-## Heteroscedasticity test
+#########################
+############ Heteroscedasticity test
 # Breush Pagan Test
 library(lmtest)
 bptest(regall3)
@@ -180,7 +186,66 @@ bptest(regall3)
 library(car)
 ncvTest(regall3)
 # Chisquare = 53.22594    Df = 1     p = 2.973063e-13
+# White Test
+# install.packages("het.test")
+library(het.test)
+whites.htest(VAR(data.frame(x=TotalChargingUnits + PercentOfBachelorDegree + ResidentialEnergyConsumedPerCapita 
+                            + RegularGasolinePrice + TotalPublicActionForEV, y=PEVRegistrations), p=1))
+# Harrison-McCabe test
+hmctest(regall3)
+# Shapiro test sur la normalité des residus
+shapiro.test(residuals(regall3))
 
+#########################
+############ Heteroscedasticity Correction
+# Box-Cox transformation 
+library(caret)
+data_tabBC = data_tab
+data_tabBC$PEVRegistrations = predict(BoxCoxTrans(data_tab$PEVRegistrations), data_tab$PEVRegistrations)
+#data_tabBC$TotalChargingUnits = predict(BoxCoxTrans(data_tab$TotalChargingUnits), data_tab$TotalChargingUnits)
+
+regallBC = lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree +
+                ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+                TotalPublicActionForEV, data = data_tabBC)
+summary(regallBC)
+bptest(regallBC)
+# BP = 1.0926, df = 5, p-value = 0.9548
+# 0.9548 beaucoup mieux que 0.01667 MAIS ... peut peut-être mieux
+plot(regallBC, sub.caption = "Diagnostic plots pour le modele (1*) avec Box-Cox transformation")
+hist(resid(regallBC), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regallBC), main = "Boxplot of Residuals")
+shapiro.test(residuals(regallBC))
+# residus accepter comme normaux
+
+#### Correction by Feasible Generalized Least Squared (FGLS)
+# comparaison entre nos residus et les White robust standard errors
+library(sandwich)
+coeftest(regall3, vcov = vcovHC(regall3, "HC1"))
+resi = regall3$residuals
+regVarfunc = lm(log(resi^2) ~ log(TotalChargingUnits) + log(PercentOfBachelorDegree) +
+                  log(ResidentialEnergyConsumedPerCapita) + log(RegularGasolinePrice) + 
+                  log(TotalPublicActionForEV), data = data_tab)
+varfunc=exp(regVarfunc$fitted.values)
+regallFGLS = lm(PEVRegistrations ~ TotalChargingUnits + PercentOfBachelorDegree +
+                ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
+                TotalPublicActionForEV, weights = 1/sqrt(varfunc), data = data_tab)
+summary(regallFGLS)
+bptest(regallFGLS)
+# BP = 1.0926, df = 5, p-value = 0.9548
+# 0.9548 beaucoup mieux que 0.01667 MAIS ... peut peut-être mieux
+plot(regallFGLS, sub.caption = "Diagnostic plots pour le modele (1*) avec FGLS Correction")
+hist(resid(regallFGLS), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regallFGLS), main = "Boxplot of Residuals")
+
+#########################
+############ Autocorrelation test 
+## Durbin Watson
+dwtest(regall3)
+# DW = 2.0101, p-value = 0.5216
+durbinWatsonTest(regall3)
+# lag Autocorrelation D-W Statistic p-value
+#  1     -0.01123168      2.010111   0.976
+### doute ... mais "true autocorrelation is greater than 0"
 
 ##########################################################
 ######## Actions Publiques toutes separees
@@ -248,18 +313,80 @@ print(fcrit)
 # diagnostic plots (les 4 graphes sur la meme fenetre) 
 layout(matrix(c(1,2,3,4),2,2))  
 plot(regallbyType)
+
+par(mfrow =c(2, 3),oma=c(2, 2, 2, 2))
+# diagnostic plots (les 4 graphes sur la meme fenetre) 
 plot(regallbyType2, sub.caption = "Diagnostic plots pour le modele (2*)")
 # provide checks for heteroscedasticity, normality, and influential observerations.
+# histogramme des résidus
+hist(resid(regallbyType2), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regallbyType2), main = "Boxplot of Residuals")
 
-## Heteroscedasticity test
+#########################
+############ Heteroscedasticity test
 # Breush Pagan Test
-library(lmtest)
+#library(lmtest)
 bptest(regallbyType2)
 # BP = 18.971, df = 6, p-value = 0.004214
-library(car)
+#library(car)
 ncvTest(regallbyType2)
 # Chisquare = 50.21008    Df = 1     p = 1.381364e-12
+# White Test
+#library(het.test)
+whites.htest(VAR(data.frame(x=TotalChargingUnits + AverageRetailPriceOfElectricity + RegularGasolinePrice 
+                            + PurchaseRebate + HOVExemption + ParkingExemption, y=PEVRegistrations), p=1))
+# Harrison-McCabe test
+hmctest(regallbyType2)
+# HMC = 0.69368, p-value = 0.984
 
+#########################
+############ Heteroscedasticity Correction
+# Box-Cox transformation
+#library(caret)
+data_tabBC = data_tab
+data_tabBC$PEVRegistrations = predict(BoxCoxTrans(data_tab$PEVRegistrations), data_tab$PEVRegistrations)
+data_tabBC$TotalChargingUnits = predict(BoxCoxTrans(data_tab$TotalChargingUnits), data_tab$TotalChargingUnits)
+
+regallbyTypeBC = lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+                      RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+                    data = data_tabBC)
+summary(regallbyTypeBC)
+bptest(regallbyTypeBC)
+# BP = 5.2409, df = 6, p-value = 0.5133
+# 0.5133 beaucoup mieux que 0.004214 MAIS ... peut mieux
+plot(regallbyTypeBC, sub.caption = "Diagnostic plots pour le modele (2*) avec Box-Cox transformation")
+hist(resid(regallbyTypeBC), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regallbyTypeBC), main = "Boxplot of Residuals")
+
+#### Correction by Feasible Generalized Least Squared (FGLS)
+# comparaison entre nos residus et les White robust standard errors
+#library(sandwich)
+coeftest(regallbyType2, vcov = vcovHC(regall3, "HC1"))
+resiType = regallbyType2$residuals
+regVarfuncType = lm(log(resiType^2) ~ log(TotalChargingUnits) + log(AverageRetailPriceOfElectricity) +
+                  log(RegularGasolinePrice) + log(PurchaseRebate) + log(ParkingExemption) +
+                  log(HOVExemption), data = data_tab)
+varfuncType=exp(regVarfuncType$fitted.values)
+regallFGLSbyType = lm(PEVRegistrations ~ TotalChargingUnits + AverageRetailPriceOfElectricity + 
+                        RegularGasolinePrice + PurchaseRebate + HOVExemption + ParkingExemption, 
+                      weights = 1/sqrt(varfuncType), data = data_tab)
+summary(regallFGLSbyType)
+bptest(regallFGLSbyType)
+# BP = 1.0926, df = 5, p-value = 0.9548
+# 0.9548 beaucoup mieux que 0.01667 MAIS ... peut peut-être mieux
+plot(regallFGLSbyType, sub.caption = "Diagnostic plots pour le modele (2*) avec FGLS Correction")
+hist(resid(regallFGLSbyType), breaks = 15, main = "Histograms of Residuals", xlab = "Residuals", ylab = "Density")
+boxplot(residuals(regallFGLSbyType), main = "Boxplot of Residuals")
+
+#########################
+############ Autocorrelation test 
+## Durbin Watson
+dwtest(regallbyType2)
+# DW = 1.6456, p-value = 0.09258
+durbinWatsonTest(regallbyType2)
+# lag Autocorrelation D-W Statistic p-value
+#  1       0.1637787      1.645641   0.162
+### doute ... mais "true autocorrelation is greater than 0"
 
 
 
