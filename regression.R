@@ -454,51 +454,24 @@ plot(booteval.relimp(boot,sort=TRUE)) # plot result
 
 
 ###################################################################
-################################# Modele lineaire General
-
-regallbyTypeGLM = glm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + 
-                     MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + 
-                     ResidentialEnergyConsumedPerCapita + RegularGasolinePrice + 
-                     IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + 
-                     ParkingExemption + EmissionInspection, data=data_tab)
-summary(regallbyTypeGLM) 
-
-###################################################################
 ################################# regression log-lineaire multiple
 
-regallbyTypeLog = regallbyType
-regallbyTypeLog = update(regallbyTypeLog, log(.) ~ log(.))
-summary(regallbyTypeLog)
+#regallbyTypeLog = regallbyType
+#regallbyTypeLog = update(regallbyTypeLog, log(.) ~ log(.))
+#summary(regallbyTypeLog)
 
-###################################################################
-################################# regression log-lineaire multiple
+regallbyTypeLog = lm(log(PEVRegistrations) ~ log(TotalChargingUnits) + log(FastChargingUnits) + 
+                        log(MedianHouseholdIncome) + log(PercentOfBachelorDegree) + log(AverageRetailPriceOfElectricity) + 
+                        log(ResidentialEnergyConsumedPerCapita) + log(RegularGasolinePrice) + 
+                        log(IncomeTaxCredit) + log(SalesTax) + log(PurchaseRebate) + log(HOVExemption) + 
+                        log(ParkingExemption) + log(EmissionInspection), data=data_tab)
+summary(regallbyTypeLog) 
 
-lndata_tab=data_tab
-lndata_tab$PEVRegistrations=log(lndata_tab$PEVRegistrations)
-lndata_tab$TotalChargingUnits=log(lndata_tab$TotalChargingUnits)
-lndata_tab$FastChargingUnits=log(lndata_tab$FastChargingUnits)
-lndata_tab$MedianHouseholdIncome=log(lndata_tab$MedianHouseholdIncome)
-lndata_tab$PercentOfBachelorDegree=log(lndata_tab$PercentOfBachelorDegree)
-lndata_tab$AverageRetailPriceOfElectricity=log(lndata_tab$AverageRetailPriceOfElectricity)
-lndata_tab$ResidentialEnergyConsumedPerCapita=log(lndata_tab$ResidentialEnergyConsumedPerCapita)
-lndata_tab$RegularGasolinePrice=log(lndata_tab$RegularGasolinePrice)
-lndata_tab$IncomeTaxCredit=log(lndata_tab$IncomeTaxCredit)
-lndata_tab$SalesTax=log(lndata_tab$SalesTax)
-lndata_tab$PurchaseRebate=log(lndata_tab$PurchaseRebate)
-lndata_tab$HOVExemption=log(lndata_tab$HOVExemption)
-lndata_tab$ParkingExemption=log(lndata_tab$ParkingExemption)
-lndata_tab$EmissionInspection=log(lndata_tab$EmissionInspection)
-lndata_tab$HomeEVSE=log(lndata_tab$HomeEVSE)
-lndata_tab$TotalPublicActionForEV=log(lndata_tab$TotalPublicActionForEV)
-
-# the regressions with their results and main statistics
-
-## function of all variables
-#lnregallType = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome 
-                #+ PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
-                #+ TotalPublicActionForEV, data=lndata_tab)
-                ####+ IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection + HomeEVSE, data=lndata_tab)
-#summary(lnregallType) 
+# selection d'un sous modele optimal selon AIC
+#library(MASS)
+stepLog=stepAIC(regallbyTypeLog, direction="both")
+stepLog$anova
+summary(stepLog)
 
 
 ###################################################################
