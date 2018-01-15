@@ -476,6 +476,30 @@ summary(stepLog)
 
 ###################################################################
 ###################################### En plus, a preciser si time
+
+### en enlevant la Californie 
+
+## function of all variables
+regallbyTypeNoCal = lm(PEVRegistrations ~ TotalChargingUnits + FastChargingUnits + MedianHouseholdIncome + PercentOfBachelorDegree + AverageRetailPriceOfElectricity + ResidentialEnergyConsumedPerCapita + RegularGasolinePrice 
+                  + IncomeTaxCredit + SalesTax + PurchaseRebate + HOVExemption + ParkingExemption + EmissionInspection, data=data_tab[-5,])
+summary(regallbyTypeNoCal) 
+
+# selection du meilleur modele inclut dans regall par coeffs de Mallow
+library(leaps)
+mallowbyTypeNoCal = leaps(x=data_tab[-5,c(5,6,8,11,13,14,15,16,17,18,19,20,21)],y=data_tab[-5,4], 
+                     names=colnames(data_tab)[c(5,6,8,11,13,14,15,16,17,18,19,20,21)], method="Cp",nbest=5)
+plot(mallowbyTypeNoCal$size,mallowbyTypeNoCal$Cp)
+min(mallowbyTypeNoCal$Cp) 
+# 3.79545 : le n°21
+mallowbyTypeNoCal$which[21,]
+# on enleve ce qui est indique : FastChargingUnits, MedianHouseholdIncome, ...
+regallbyTypeNoCal2 = regallbyTypeNoCal
+regallbyTypeNoCal2 = update(regallbyTypeNoCal2,  ~ .-FastChargingUnits-MedianHouseholdIncome-PercentOfBachelorDegree-AverageRetailPriceOfElectricity-SalesTax-EmissionInspection)
+summary(regallbyTypeNoCal2)
+
+# on compare le modele epure choisi a l'original
+anova(regallbyTypeNoCal,regallbyTypeNoCal2)
+
 # librairies additionnelles pour regresser par subsets selon un vecteur
 
 #library(nlme)
